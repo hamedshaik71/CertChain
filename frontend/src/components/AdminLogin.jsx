@@ -56,7 +56,16 @@ const AdminLogin = ({ onLogin, onClose }) => {
                 })
             });
 
-            const data = await response.json();
+            let data;
+
+try {
+   const text = await response.text();
+   data = text ? JSON.parse(text) : {};
+} catch (err) {
+   console.error("💀 Invalid JSON response:", err);
+   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+}
+
 
             if (!response.ok) {
                 throw new Error(data.message || data.error || 'Login failed');

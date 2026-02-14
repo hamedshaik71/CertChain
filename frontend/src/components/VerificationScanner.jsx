@@ -31,7 +31,16 @@ const VerificationScanner = ({ onVerify, certificateHash }) => {
         try {
             // Call verification API
             const response = await fetch(`/api/public/verify/${certificateHash}`);
-            const data = await response.json();
+            let data;
+
+try {
+   const text = await response.text();
+   data = text ? JSON.parse(text) : {};
+} catch (err) {
+   console.error("💀 Invalid JSON response:", err);
+   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+}
+
 
             await new Promise(resolve => setTimeout(resolve, 1000));
 

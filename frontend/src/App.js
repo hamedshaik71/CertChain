@@ -1823,7 +1823,16 @@ function AdminDashboard({ userData, onLogout, addNotification }) {
             })
         });
 
-        const data = await response.json();
+        let data;
+
+try {
+   const text = await response.text();
+   data = text ? JSON.parse(text) : {};
+} catch (err) {
+   console.error("💀 Invalid JSON response:", err);
+   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+}
+
 
         if (data.success) {
             setActionModal(prev => ({ ...prev, status: 'success' }));

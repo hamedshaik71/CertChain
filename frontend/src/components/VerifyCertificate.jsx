@@ -38,7 +38,16 @@ const VerifyCertificate = () => {
     const verifyCertificate = async () => {
         try {
             const response = await fetch(`${SERVER_URL}/api/certificates/verify/${hash}`);
-            const data = await response.json();
+            let data;
+
+try {
+   const text = await response.text();
+   data = text ? JSON.parse(text) : {};
+} catch (err) {
+   console.error("💀 Invalid JSON response:", err);
+   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+}
+
 
             if (data.success) {
                 setCertificate(data.certificate);

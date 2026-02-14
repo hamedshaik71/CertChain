@@ -49,7 +49,16 @@ function StudentDashboard() {
                 }
             });
             
-            const data = await response.json();
+            let data;
+
+try {
+   const text = await response.text();
+   data = text ? JSON.parse(text) : {};
+} catch (err) {
+   console.error("💀 Invalid JSON response:", err);
+   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+}
+
             console.log('Certificates response:', data);
             
             if (data.success && data.certificates && data.certificates.length > 0) {
