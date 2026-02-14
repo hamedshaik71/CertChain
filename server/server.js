@@ -44,7 +44,6 @@ const app = express();
 const web3 = new Web3(process.env.WEB3_RPC_URL || 'http://127.0.0.1:7545');
 console.log(`🔗 Web3 connected to: ${process.env.WEB3_RPC_URL || 'http://127.0.0.1:7545'}`);
 
-// ✅ CORS
 app.use(cors({
     origin: [
         'http://localhost:3000',
@@ -52,12 +51,16 @@ app.use(cors({
         'http://localhost:5000',
         'http://127.0.0.1:5000',
         'http://localhost:3001',
-        'http://127.0.0.1:3001'
+        'http://127.0.0.1:3001',
+
+        // ✅ ADD THIS 👇
+        'https://certchain-frontend-s4y2.onrender.com'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
 app.options('*', cors());
 
 // Middleware
