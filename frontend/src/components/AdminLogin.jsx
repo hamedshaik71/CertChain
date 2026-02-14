@@ -49,7 +49,7 @@ const AdminLogin = ({ onLogin, onClose }) => {
             const response = await fetch('/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+                body: ({
                     email: formData.email,
                     secretCode: formData.secretCode,
                     mnemonic12Words: formData.mnemonic

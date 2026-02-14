@@ -86,20 +86,20 @@ const api = {
 
     // Student APIs
     async loginStudent(data) {
-        return this.request('/api/student/login', { method: 'POST', body: JSON.stringify(data) });
+        return this.request('/api/student/login', { method: 'POST', body: data });
     },
 
     async registerStudent(data) {
-        return this.request('/api/student/register', { method: 'POST', body: JSON.stringify(data) });
+        return this.request('/api/student/register', { method: 'POST', body: data });
     },
 
     async getStudentCertificates(studentCode) {
-        return this.request('/api/student/certificates', { method: 'POST', body: JSON.stringify({ studentCode }) });
+        return this.request('/api/student/certificates', { method: 'POST', body: studentCode  });
     },
 
     // Institution APIs
     async loginInstitution(data) {
-        return this.request('/api/institution/login', { method: 'POST', body: JSON.stringify(data) });
+        return this.request('/api/institution/login', { method: 'POST', body: data });
     },
 
     async registerInstitution(formData) {
@@ -117,7 +117,7 @@ const api = {
     },
 
     async forgotPassword(email) {
-        return this.request('/api/institution/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+        return this.request('/api/institution/forgot-password', { method: 'POST', body: {email} });
     },
 
     async getInstitutionDashboard() {
@@ -129,7 +129,7 @@ const api = {
     },
 
     async addStudent(data) {
-        return this.request('/api/student/register', { method: 'POST', body: JSON.stringify(data) });
+        return this.request('/api/student/register', { method: 'POST', body: data });
     },
 
     // Certificate APIs
@@ -146,7 +146,7 @@ const api = {
     async bulkIssueCertificates(certificates) {
         return this.request('/api/certificate/bulk-issue', {
             method: 'POST',
-            body: JSON.stringify({ certificates }),
+            body: { certificates },
         });
     },
 
@@ -157,13 +157,13 @@ const api = {
     async revokeCertificate(certificateHash, reason) {
         return this.request('/api/certificate/revoke', {
             method: 'POST',
-            body: JSON.stringify({ certificateHash, reason }),
+            body: { certificateHash, reason },
         });
     },
 
     // Admin APIs
     async loginAdmin(credentials) {
-        return this.request('/api/admin/login', { method: 'POST', body: JSON.stringify(credentials) });
+        return this.request('/api/admin/login', { method: 'POST', body: credentials });
     },
 
     async getAdminStats() {
@@ -181,7 +181,7 @@ const api = {
     async rejectInstitution(id, reason) {
         return this.request(`/api/admin/reject-institution/${id}`, {
             method: 'POST',
-            body: JSON.stringify({ reason }),
+            body: { reason },
         });
     },
 
@@ -192,7 +192,7 @@ const api = {
     async processCertificate(certificateId, action, comments) {
         return this.request('/api/admin/process-certificate', {
             method: 'POST',
-            body: JSON.stringify({ certificateId, action, comments }),
+            body: { certificateId, action, comments },
         });
     },
 };
@@ -1954,7 +1954,7 @@ function AdminDashboard({ userData, onLogout, addNotification }) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
+            body: ({
                 certificateId: actionModal.cert._id,
                 action: actionModal.type,
                 comments:
@@ -2005,7 +2005,7 @@ function AdminDashboard({ userData, onLogout, addNotification }) {
         try {
             const response = await api.request('/api/admin/process-certificate', {
                 method: 'POST',
-                body: JSON.stringify({
+                body: ({
                     certificateId: cert._id,
                     action: action, // 'APPROVE' or 'REJECT'
                     comments: action === 'APPROVE'

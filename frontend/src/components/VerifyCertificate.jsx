@@ -65,7 +65,7 @@ const VerifyCertificate = () => {
             await fetch(`${SERVER_URL}/api/certificates/log-verification`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ certificateId: certId, viewerInfo, timestamp: new Date().toISOString() })
+                body: ({ certificateId: certId, viewerInfo, timestamp: new Date().toISOString() })
             });
         } catch (error) {}
     };
