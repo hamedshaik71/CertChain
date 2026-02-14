@@ -1,0 +1,205 @@
+/* BACKGROUND */
+.nft-page {
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, #1a1a2e, #000000);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.nft-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+}
+
+/* 3D CARD ANIMATION */
+.card-3d-wrapper {
+    width: 400px;
+    height: 550px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: floating 6s ease-in-out infinite;
+}
+
+.card-3d {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    position: relative;
+    transform: rotateY(15deg) rotateX(5deg);
+    transition: transform 0.5s ease;
+    box-shadow: -20px 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.card-3d:hover {
+    transform: rotateY(0deg) rotateX(0deg) scale(1.05);
+    box-shadow: 0px 0px 80px rgba(99, 102, 241, 0.6);
+}
+
+.holographic-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 30%
+    );
+    animation: shine 3s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes shine {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* CARD CONTENT */
+.card-content {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.chain-badge, .sbt-badge {
+    background: rgba(0,0,0,0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.card-art {
+    font-size: 120px;
+    text-align: center;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+}
+
+.card-footer h3 { margin: 0; font-size: 24px; }
+.card-footer p { margin: 5px 0 0; opacity: 0.8; font-family: monospace; }
+
+/* DATA SECTION */
+.nft-data-section {
+    padding-top: 20px;
+}
+
+.collection-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #a855f7;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.chain-icon { width: 20px; }
+
+.nft-title {
+    font-size: 42px;
+    margin: 0 0 20px;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    background-clip: none;
+    -webkit-text-fill-color: transparent;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* TRAITS */
+.traits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.trait-box {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid #6366f1;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.trait-box:hover {
+    transform: translateY(-5px);
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.trait-type { font-size: 11px; text-transform: uppercase; color: #a5b4fc; letter-spacing: 1px; }
+.trait-value { font-size: 16px; font-weight: bold; margin: 5px 0; }
+.trait-rarity { font-size: 12px; color: #9ca3af; }
+
+/* BUTTON */
+.opensea-btn {
+    width: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    border: none;
+    background: #3b82f6;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.opensea-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+}
+
+/* LOADER */
+.loader-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    color: #6366f1;
+}
+
+.scanner {
+    width: 100px;
+    height: 100px;
+    border: 4px solid #6366f1;
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }

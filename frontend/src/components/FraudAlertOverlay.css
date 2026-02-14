@@ -1,0 +1,326 @@
+.fraud-alert-overlay {
+    position: relative;
+    background: rgba(30, 41, 59, 0.95);
+    border-radius: 20px;
+    padding: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.alert-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 3px solid;
+    border-radius: 20px;
+    pointer-events: none;
+}
+
+.severity-critical .alert-border { border-color: #ef4444; }
+.severity-high .alert-border { border-color: #f97316; }
+.severity-medium .alert-border { border-color: #f59e0b; }
+.severity-low .alert-border { border-color: #3b82f6; }
+
+/* Header */
+.alert-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-icon {
+    font-size: 2.5rem;
+}
+
+.alert-title {
+    flex: 1;
+}
+
+.alert-title h3 {
+    color: white;
+    margin: 0 0 0.25rem 0;
+    font-size: 1.2rem;
+}
+
+.severity-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.btn-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Risk Score */
+.risk-score-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.risk-meter {
+    position: relative;
+    width: 150px;
+    height: 80px;
+}
+
+.risk-gauge {
+    width: 100%;
+    height: 100%;
+}
+
+.risk-value {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.risk-value span:first-child {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+}
+
+.risk-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+/* Issues List */
+.detected-issues h4 {
+    color: white;
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+}
+
+.issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.issue-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+
+.issue-icon {
+    font-size: 1.5rem;
+}
+
+.issue-content {
+    flex: 1;
+}
+
+.issue-type {
+    display: block;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+.issue-message {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+}
+
+.issue-severity {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Expand Button */
+.btn-expand {
+    width: 100%;
+    padding: 0.75rem;
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.btn-expand:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+}
+
+/* Details Section */
+.alert-details {
+    overflow: hidden;
+}
+
+.detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.detail-section h5 {
+    color: white;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.detail-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+.detail-item span {
+    display: block;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    margin-bottom: 0.15rem;
+}
+
+.detail-item strong,
+.detail-item code {
+    color: white;
+    font-size: 0.85rem;
+}
+
+/* Breakdown */
+.breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-label {
+    width: 100px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+
+.breakdown-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.breakdown-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.breakdown-value {
+    width: 40px;
+    text-align: right;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Recommendations */
+.recommendations-list {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.recommendations-list li {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Actions */
+.alert-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.alert-actions button {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-investigate {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+}
+
+.btn-block {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+
+.btn-report {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.alert-actions button:hover {
+    transform: translateY(-2px);
+}
+
+/* Pulse Overlay */
+.pulse-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid;
+    border-radius: 50%;
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "certificateHash": "CERT-1770881229030-2E516EC211281D61",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "studentName": "Demo Student",
+    "studentEmail": "user@example.com",
+    "courseName": "Blockchain Development Masterclass",
+    "institutionName": "Tech University",
+    "grade": "A+",
+    "issueDate": "2023-10-25T10:00:00.000Z",
+    "status": "ISSUED",
+    "transactionHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    "blockNumber": 123456,
+    "verified": true
+  },
+  {
+    "certificateHash": "CERT-DEMO-002",
+    "studentName": "John Doe",
+    "courseName": "React Fundamentals",
+    "institutionName": "Code Academy",
+    "grade": "A",
+    "issueDate": "2023-11-01T10:00:00.000Z",
+    "status": "ISSUED",
+    "verified": true
+  },
+  {
+    "certificateHash": "CERT-1771067644756-2D1AB05B8014F1A7",
+    "sha256Hash": "2ffdeed29a868bf035867c8d486cd8bcd1ae7d74c88be4a14a15c3d3a154e014",
+    "studentName": "Priya Mehta",
+    "studentEmail": "priya.mehta@student.com",
+    "studentCode": "NIOT5883-MLJ3G852-B085BF85",
+    "courseName": "Test 4",
+    "institutionName": "National Institute of Technology",
+    "institutionAddress": "registrar@nitexample.ac.in",
+    "grade": "B+",
+    "issueDate": "2026-02-14T00:00:00.000Z",
+    "status": "ISSUED",
+    "transactionHash": "0x219ef27fe1d9a6bc22a892db29f4b1bf24ad66f5ef95ef7aec81d8b7bcb4b062",
+    "blockNumber": 123456,
+    "verified": true,
+    "blockchainVerified": true,
+    "addedAt": "2026-02-14T11:14:04.813Z"
+  }
+]

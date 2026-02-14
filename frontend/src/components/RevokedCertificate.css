@@ -1,0 +1,223 @@
+.revoked-certificate {
+    position: relative;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+/* Revoked Overlay */
+.revoked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.revoked-stamp {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 3px solid #dc2626;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+}
+
+.stamp-text {
+    display: block;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.stamp-date {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+}
+
+.warning-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.3), transparent);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Certificate Content */
+.certificate-content.greyed {
+    background: rgba(75, 85, 99, 0.3);
+    border: 2px solid rgba(239, 68, 68, 0.5);
+    border-radius: 20px;
+    padding: 2rem;
+    filter: grayscale(0.7);
+    opacity: 0.7;
+}
+
+.cert-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cert-icon {
+    font-size: 2rem;
+    opacity: 0.5;
+}
+
+.cert-header h3 {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    text-decoration: line-through;
+    text-decoration-color: #ef4444;
+}
+
+.cert-details {
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row span {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.detail-row strong {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.detail-row.strikethrough strong {
+    text-decoration: line-through;
+    color: #ef4444;
+}
+
+.cert-hash {
+    text-align: center;
+}
+
+.cert-hash code {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    text-decoration: line-through;
+}
+
+/* Revocation Info */
+.revocation-info {
+    margin-top: 1.5rem;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.revocation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.warning-icon {
+    font-size: 1.5rem;
+}
+
+.revocation-header h4 {
+    color: #ef4444;
+    margin: 0;
+}
+
+.revocation-details .detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+.revocation-details .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+.revocation-details .value {
+    color: white;
+    font-weight: 600;
+}
+
+.revocation-details .value.error {
+    color: #ef4444;
+}
+
+.revocation-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-appeal,
+.btn-contact {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-appeal {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid #f59e0b;
+    color: #f59e0b;
+}
+
+.btn-contact {
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid #667eea;
+    color: #667eea;
+}
+
+.btn-appeal:hover,
+.btn-contact:hover {
+    transform: translateY(-2px);
+}
+
+/* X Marks */
+.x-marks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.x-mark {
+    position: absolute;
+    font-size: 3rem;
+    color: rgba(239, 68, 68, 0.3);
+    font-weight: bold;
+}
+
+.x-mark:nth-child(1) { top: 20%; left: 10%; }
+.x-mark:nth-child(2) { top: 40%; right: 15%; }
+.x-mark:nth-child(3) { bottom: 30%; left: 20%; }

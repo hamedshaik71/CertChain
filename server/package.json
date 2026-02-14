@@ -1,0 +1,41 @@
+{
+  "name": "certchain-server",
+  "version": "1.0.0",
+  "description": "CertChain Backend API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "blockchain",
+    "certificates",
+    "ethereum"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.988.0",
+    "@aws-sdk/lib-storage": "^3.988.0",
+    "axios": "^1.13.5",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "ethers": "^6.16.0",
+    "express": "^4.18.2",
+    "js-sha256": "^0.11.1",
+    "jsonwebtoken": "^9.0.2",
+    "jspdf": "^4.1.0",
+    "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "pdf2json": "^4.0.2",
+    "pdfkit": "^0.17.2",
+    "qrcode": "^1.5.4",
+    "web3": "^4.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

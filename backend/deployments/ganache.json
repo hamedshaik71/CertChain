@@ -1,0 +1,8 @@
+{
+  "network": "ganache",
+  "contractAddress": "0x2B46A4342D09e12545b10Aa4C6220a5a7B3F966B",
+  "deployer": "0x565412D2b04F3c20Cc813F3C78A5D79648e63C6C",
+  "transactionHash": "0x1fc6aca86dce9d82be274efa189906f098bbae0144e39ddcd6bdc128849e2861",
+  "timestamp": "2026-02-08T11:00:05.922Z",
+  "blockNumber": 3
+}

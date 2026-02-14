@@ -1,0 +1,243 @@
+.certificate-timeline {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.timeline-header h3 {
+    color: white;
+    margin: 0;
+}
+
+.event-count {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+/* Story Indicators */
+.story-indicators {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1rem;
+}
+
+.indicator {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.indicator.viewed {
+    background: #667eea;
+}
+
+/* Timeline Carousel */
+.timeline-carousel {
+    user-select: none;
+    cursor: grab;
+}
+
+.timeline-carousel:active {
+    cursor: grabbing;
+}
+
+.timeline-card {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    color: white;
+}
+
+.event-icon {
+    font-size: 1.5rem;
+}
+
+.event-type {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-content h4 {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.event-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+}
+
+.event-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail .label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.detail .value {
+    color: white;
+    font-weight: 600;
+}
+
+.blockchain-proof {
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.blockchain-proof span {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.blockchain-proof code {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-number {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+.swipe-hint {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+}
+
+/* Navigation */
+.timeline-nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.nav-btn {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mini Timeline */
+.mini-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+}
+
+.mini-event {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.mini-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.mini-event.active .mini-dot {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 0 15px currentColor;
+}
+
+.mini-icon {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.mini-event:hover .mini-icon,
+.mini-event.active .mini-icon {
+    opacity: 1;
+}
+
+.mini-line {
+    width: 30px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 4px;
+}

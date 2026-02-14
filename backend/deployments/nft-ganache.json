@@ -1,0 +1,9 @@
+{
+  "network": "ganache",
+  "contractName": "CertificateNFT",
+  "contractAddress": "0xC8f7E98789F84204750Ac00bEfe67097598A2cE2",
+  "deployer": "0x565412D2b04F3c20Cc813F3C78A5D79648e63C6C",
+  "transactionHash": "0x40563e87a75d1ef650c6530d06c5496eb04445826551601c35251fec9e9b9d0a",
+  "timestamp": "2026-02-14T06:31:02.982Z",
+  "blockNumber": 4
+}

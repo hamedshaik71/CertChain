@@ -1,0 +1,305 @@
+/* ============ BUTTON RIPPLE EFFECT ============ */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+
+.btn-ripple:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+}
+
+/* ============ HOVER GLOW ============ */
+.hover-glow {
+    transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 
+        0 0 20px rgba(102, 126, 234, 0.4),
+        0 0 40px rgba(102, 126, 234, 0.2),
+        0 0 60px rgba(102, 126, 234, 0.1);
+}
+
+/* ============ CARD TILT ============ */
+.card-tilt {
+    transition: transform 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.card-tilt:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* ============ SUCCESS PULSE ============ */
+.success-pulse {
+    animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); }
+    100% { transform: scale(1); }
+}
+
+/* ============ ERROR SHAKE ============ */
+.error-shake {
+    animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+
+/* ============ LOADING SKELETON ============ */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ============ FOCUS RING ============ */
+.focus-ring:focus {
+    outline: none;
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.5),
+        0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+/* ============ STAGGER ANIMATION ============ */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: staggerIn 0.5s ease forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes staggerIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============ MORPHING BUTTON ============ */
+.btn-morph {
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.btn-morph:hover {
+    border-radius: 25px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.btn-morph:active {
+    transform: scale(0.95);
+}
+
+/* ============ FLOATING LABELS ============ */
+.input-float {
+    position: relative;
+}
+
+.input-float input {
+    padding-top: 1.5rem;
+}
+
+.input-float label {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.input-float input:focus + label,
+.input-float input:not(:placeholder-shown) + label {
+    top: 0.75rem;
+    font-size: 0.75rem;
+    color: #667eea;
+}
+
+/* ============ MAGNETIC BUTTON ============ */
+.btn-magnetic {
+    transition: transform 0.2s ease-out;
+}
+
+/* ============ TYPEWRITER TEXT ============ */
+.typewriter {
+    overflow: hidden;
+    border-right: 2px solid #667eea;
+    white-space: nowrap;
+    animation: 
+        typing 3s steps(30) 1s 1 normal both,
+        blinkCursor 0.5s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blinkCursor {
+    50% { border-color: transparent; }
+}
+
+/* ============ GRADIENT BORDER ============ */
+.gradient-border {
+    position: relative;
+    background: var(--bg-card);
+    z-index: 1;
+}
+
+.gradient-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+    background-size: 200% 200%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: gradientMove 3s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ============ COUNTER ANIMATION ============ */
+.counter-animate {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.counter-animate.increment {
+    animation: counterUp 0.3s ease;
+}
+
+.counter-animate.decrement {
+    animation: counterDown 0.3s ease;
+}
+
+@keyframes counterUp {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); opacity: 0.5; }
+    100% { transform: translateY(0); }
+}
+
+@keyframes counterDown {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(10px); opacity: 0.5; }
+    100% { transform: translateY(0); }
+}
+
+/* ============ PROGRESS RING ============ */
+.progress-ring {
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+/* ============ TOOLTIP ANIMATION ============ */
+.tooltip-animated {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+}
+
+*:hover > .tooltip-animated {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ============ ICON SPIN ============ */
+.icon-spin:hover {
+    animation: iconSpin 0.5s ease;
+}
+
+@keyframes iconSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============ ELASTIC BUTTON ============ */
+.btn-elastic {
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.btn-elastic:active {
+    transform: scale(0.85);
+}
+
+/* ============ BREATHING EFFECT ============ */
+.breathing {
+    animation: breathing 3s ease-in-out infinite;
+}
+
+@keyframes breathing {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.9; }
+}
+
+/* ============ NOTIFICATION DOT ============ */
+.notification-dot {
+    position: relative;
+}
+
+.notification-dot::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: notificationPulse 1s ease infinite;
+}
+
+@keyframes notificationPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}

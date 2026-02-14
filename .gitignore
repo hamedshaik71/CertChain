@@ -1,0 +1,111 @@
+# =====================
+# Node Modules (CRITICAL)
+# =====================
+node_modules/
+**/node_modules/
+
+# =====================
+# Environment Files (SECRETS 🔐)
+# =====================
+.env
+.env.*
+**/.env
+**/.env.*
+
+# =====================
+# Build / Output
+# =====================
+build/
+dist/
+coverage/
+.next/
+out/
+
+# =====================
+# Logs
+# =====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =====================
+# OS Junk 💀
+# =====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =====================
+# IDE / Editor
+# =====================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# =====================
+# Hardhat / Blockchain
+# =====================
+artifacts/
+cache/
+typechain/
+coverage/
+gas-report.txt
+*.tsbuildinfo
+
+# =====================
+# Uploads / Generated Files
+# =====================
+uploads/
+**/uploads/
+temp/
+tmp/
+generated/
+public/generated/
+
+# =====================
+# Certificates / PDFs
+# =====================
+certificates/
+*.pdf
+
+# =====================
+# MongoDB Local Data
+# =====================
+data/
+*.db
+*.sqlite
+
+# =====================
+# Package Manager Noise
+# =====================
+.pnpm-store/
+.yarn/
+.yarn-cache/
+.yarn/unplugged/
+
+# =====================
+# Docker (optional)
+# =====================
+docker-data/
+*.pid
+
+# =====================
+# Test / Debug Output
+# =====================
+coverage/
+.nyc_output/
+
+# =====================
+# Misc
+# =====================
+*.tgz
+*.zip
+*.rar

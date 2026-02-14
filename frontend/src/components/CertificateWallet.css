@@ -1,0 +1,408 @@
+.certificate-wallet {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.wallet-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.wallet-icon {
+    font-size: 2rem;
+}
+
+.wallet-header h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.card-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.85rem;
+}
+
+/* Cards Container */
+.cards-container {
+    position: relative;
+    height: 280px;
+    perspective: 1000px;
+}
+
+/* 3D Card */
+.certificate-card-3d {
+    width: 100%;
+    max-width: 380px;
+    height: 240px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+.card-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 0;
+}
+
+/* Holographic Effect */
+.holographic-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(
+            135deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 45%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0.1) 55%,
+            transparent 100%
+        );
+    background-size: 200% 200%;
+    animation: holographic 3s ease infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes holographic {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Card Front */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
+.institution-logo {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.institution-info h3 {
+    color: white;
+    font-size: 0.95rem;
+    margin: 0 0 0.15rem 0;
+    font-weight: 600;
+}
+
+.institution-code {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+}
+
+.status-badge {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.card-body {
+    padding: 0 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
+.course-name {
+    color: white;
+    font-size: 1.3rem;
+    margin: 0 0 0.25rem 0;
+    font-weight: 700;
+}
+
+.student-name {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    margin: 0 0 1rem 0;
+}
+
+.card-details {
+    display: flex;
+    gap: 2rem;
+}
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.detail .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail .value {
+    color: white;
+    font-weight: 600;
+}
+
+.detail .grade {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+}
+
+.blockchain-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tap-hint {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+}
+
+/* Card Back */
+.back-header {
+    padding: 1rem 1.25rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.back-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.back-content {
+    padding: 0 1.25rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.qr-container {
+    margin-bottom: 1rem;
+}
+
+.qr-code {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    background: white;
+    padding: 8px;
+}
+
+.hash-info,
+.tx-info {
+    margin-bottom: 0.5rem;
+}
+
+.back-content .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.hash {
+    color: white;
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.verification-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.75rem;
+}
+
+.verification-count .count {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+}
+
+.verification-count .label {
+    margin-top: 0 !important;
+}
+
+.back-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.action-btn-small {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn-small:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Navigation */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #667eea;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.nav-btn:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.nav-prev { left: -20px; }
+.nav-next { right: -20px; }
+
+/* Card Dots */
+.card-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: white;
+}
+
+/* Wallet Actions */
+.wallet-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
