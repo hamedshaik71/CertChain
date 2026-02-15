@@ -2731,6 +2731,9 @@ function BlockchainProof({ certificate, onStore, addNotification }) {
     const [showDetails, setShowDetails] = useState(false);
     const [verificationResult, setVerificationResult] = useState(null);
 
+    // ✅ FIX: Added API URL constant
+    const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+
     useEffect(() => {
         fetchBlockchainStats();
         if (certificate?.blockchainTx) {
@@ -2746,7 +2749,8 @@ function BlockchainProof({ certificate, onStore, addNotification }) {
 
     const fetchBlockchainStats = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/blockchain/stats');
+            // ✅ FIX: Changed localhost to API_URL
+            const response = await axios.get(`${API_URL}/api/blockchain/stats`);
             if (response.data.success) {
                 setBlockchainStats(response.data.stats);
             }
@@ -2763,7 +2767,8 @@ function BlockchainProof({ certificate, onStore, addNotification }) {
 
         setStoring(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/blockchain/store', {
+            // ✅ FIX: Changed localhost to API_URL
+            const response = await axios.post(`${API_URL}/api/blockchain/store`, {
                 certificateHash: certificate.certificateHash,
                 studentCode: certificate.studentCode,
                 courseName: certificate.courseName,
@@ -2789,7 +2794,8 @@ function BlockchainProof({ certificate, onStore, addNotification }) {
 
         setVerifying(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/blockchain/verify', {
+            // ✅ FIX: Changed localhost to API_URL
+            const response = await axios.post(`${API_URL}/api/blockchain/verify`, {
                 certificateHash: certificate.certificateHash
             });
 
