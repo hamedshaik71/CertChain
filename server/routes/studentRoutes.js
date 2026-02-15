@@ -300,23 +300,35 @@ router.post('/register', async (req, res) => {
 // Student Login
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, studentCode } = req.body;
 
-        if (!email || !password) {
+        if (!password) {
             return res.status(400).json({
                 success: false,
-                message: 'Email and password are required'
+                message: 'Password is required'
             });
         }
 
-        const student = await Student.findOne({ 
-            email: email.toLowerCase() 
-        });
+        if (!email && !studentCode) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email or student code is required'
+            });
+        }
+
+        // Find student by email OR studentCode
+        let student = null;
+        if (email) {
+            student = await Student.findOne({ email: email.toLowerCase() });
+        }
+        if (!student && studentCode) {
+            student = await Student.findOne({ studentCode: studentCode });
+        }
 
         if (!student) {
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password'
+                message: 'Invalid credentials'
             });
         }
 
@@ -332,7 +344,7 @@ router.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password'
+                message: 'Invalid credentials'
             });
         }
 
@@ -347,11 +359,13 @@ router.post('/login', async (req, res) => {
                 id: student._id,
                 email: student.email,
                 studentCode: student.studentCode,
-                name: student.fullName,
-                type: 'student'
+                fullName: student.fullName,
+                role: 'student',
+                institutionAddress: student.institutionAddress,
+                institutionName: student.institutionName
             },
             JWT_SECRET,
-            { expiresIn: '7d' }
+            { expiresIn: '30d' }
         );
 
         console.log('✅ Student logged in:', student.email);
@@ -360,7 +374,21 @@ router.post('/login', async (req, res) => {
             success: true,
             message: 'Login successful',
             token,
-            student: student.getPublicProfile()
+            student: {
+                id: student._id,
+                studentCode: student.studentCode,
+                fullName: student.fullName,
+                email: student.email,
+                phone: student.phone,
+                institutionName: student.institutionName,
+                institutionAddress: student.institutionAddress,
+                program: student.program,
+                department: student.department,
+                status: student.status,
+                isVerified: student.isVerified,
+                lastLogin: student.lastLogin,
+                loginCount: student.loginCount
+            }
         });
 
     } catch (error) {
