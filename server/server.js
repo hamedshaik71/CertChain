@@ -1691,7 +1691,7 @@ app.get('/api/institution/dashboard',
 // ============================================================================
 
 // ============================================================================
-// 1️⃣3️⃣ GET INSTITUTION STUDENTS
+// 1️⃣3️⃣ GET INSTITUTION STUDENTS (FIXED)
 // ============================================================================
 
 app.get('/api/institution/students',
@@ -1699,45 +1699,39 @@ app.get('/api/institution/students',
     roleCheck(['institution']),
     async (req, res) => {
         try {
-            console.log('👨‍🎓 Fetching institution students for:', req.user.email);
+            console.log('👨‍🎓 Fetching institution students...');
+            console.log(`   🔍 Logged in as: ${req.user.institutionCode} (${req.user.email})`);
 
-            // 1. Gather all possible identifiers for this institution
+            // 1. Define all possible ways a student might be linked to this institution
             const identifiers = [
-                req.user.email,             // Match by Email
-                req.user.institutionCode    // Match by Code (Most common)
+                req.user.institutionCode,  // MATCH BY CODE (Most common)
+                req.user.email             // MATCH BY EMAIL
             ];
 
-            // Match by Wallet (if it exists)
             if (req.user.walletAddress) {
-                identifiers.push(req.user.walletAddress);
-            }
-            
-            // Match by ID string
-            if (req.user.institutionId) {
-                identifiers.push(req.user.institutionId.toString());
+                identifiers.push(req.user.walletAddress); // MATCH BY WALLET
             }
 
-            console.log('🔍 Searching students with identifiers:', identifiers);
-
-            // 2. Find students matching ANY of these identifiers
+            // 2. Query MongoDB
+            // We look for students who have your Code OR your Email OR your Wallet
             const students = await Student.find({
                 $or: [
-                    { institutionAddress: { $in: identifiers } }, // Checks if student linked via Addr/Email
-                    { institutionName: req.user.institutionCode }, // Checks if linked via Name/Code field
-                    { institutionCode: req.user.institutionCode }  // Specific check for code
+                    { institutionCode: req.user.institutionCode },       // Direct code match (Best)
+                    { institutionAddress: { $in: identifiers } },        // Address field match
+                    { institutionName: req.user.institutionCode }        // Name fallback
                 ]
             }).sort({ createdAt: -1 });
 
-            console.log(`✅ Found ${students.length} students`);
+            console.log(`   ✅ Found ${students.length} students.`);
 
             res.json({
                 success: true,
-                students,
-                count: students.length
+                count: students.length,
+                students: students
             });
 
         } catch (error) {
-            console.error('Get students error:', error);
+            console.error('❌ Get students error:', error);
             res.status(500).json({ error: error.message });
         }
     }
