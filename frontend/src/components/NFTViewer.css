@@ -203,3 +203,22 @@
 }
 
 @keyframes spin { 100% { transform: rotate(360deg); } }
+.error-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+}

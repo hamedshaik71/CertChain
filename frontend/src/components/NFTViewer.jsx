@@ -7,6 +7,7 @@ const NFTViewer = () => {
     const { tokenId } = useParams();
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // ✅ READ DYNAMIC DATA FROM URL
     const courseName = searchParams.get('name') || "Academic Credential";
@@ -14,9 +15,30 @@ const NFTViewer = () => {
     const grade = searchParams.get('grade') || "Verified";
 
     useEffect(() => {
+        // ✅ FIX: Check if tokenId exists
+        if (!tokenId) {
+            setError('No Token ID provided');
+            setLoading(false);
+            return;
+        }
+
         // Simulate "Blockchain Query" delay
         setTimeout(() => setLoading(false), 2000);
-    }, []);
+    }, [tokenId]);
+
+    // ✅ FIX: Show error state if no tokenId
+    if (error) {
+        return (
+            <div className="loader-container">
+                <div className="error-icon">❌</div>
+                <h2>NFT Not Found</h2>
+                <p>{error}</p>
+                <button onClick={() => window.history.back()} className="back-btn">
+                    ← Go Back
+                </button>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
