@@ -46,10 +46,13 @@ const AdminLogin = ({ onLogin, onClose }) => {
         setError(null);
 
         try {
-            const response = await fetch('/api/admin/login', {
+            // ✅ FIX: Use environment variable for API URL
+            const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+            
+            const response = await fetch(`${API_URL}/api/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: ({
+                body: JSON.stringify({
                     email: formData.email,
                     secretCode: formData.secretCode,
                     mnemonic12Words: formData.mnemonic
@@ -58,27 +61,56 @@ const AdminLogin = ({ onLogin, onClose }) => {
 
             let data;
 
-try {
-   const text = await response.text();
-   data = text ? JSON.parse(text) : {};
-} catch (err) {
-   console.error("💀 Invalid JSON response:", err);
-   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
-}
-
+            try {
+                const text = await response.text();
+                data = text ? JSON.parse(text) : {};
+            } catch (err) {
+                console.error("💀 Invalid JSON response:", err);
+                data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+            }
 
             if (!response.ok) {
                 throw new Error(data.message || data.error || 'Login failed');
             }
 
-            // Store token and user data
+            // ✅ FIX: Ensure token exists before storing
+            if (!data.token) {
+                throw new Error('No authentication token received from server');
+            }
+
+            // ✅ FIX: Store token and user data properly
             localStorage.setItem('token', data.token);
             localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('userData', JSON.stringify(data.admin));
+            localStorage.setItem('adminEmail', data.admin?.email || formData.email);
+            localStorage.setItem('adminLevel', data.admin?.adminLevel || 'LEVEL_1');
+            
+            // Store complete user data as JSON
+            if (data.admin) {
+                localStorage.setItem('userData', JSON.stringify(data.admin));
+            }
 
-            onLogin(data);
+            // ✅ FIX: Log successful login for debugging
+            console.log('✅ Admin login successful:', {
+                email: data.admin?.email,
+                level: data.admin?.adminLevel,
+                tokenStored: !!localStorage.getItem('token')
+            });
+
+            // Call parent onLogin with complete data
+            onLogin({
+                ...data,
+                userData: {
+                    email: data.admin?.email || formData.email,
+                    adminLevel: data.admin?.adminLevel || 'LEVEL_1',
+                    wallet: data.admin?.wallet,
+                    role: 'admin'
+                }
+            });
+
         } catch (err) {
+            console.error('❌ Admin login error:', err);
             setError(err.message);
+            
             // Shake animation on error
             document.querySelector('.admin-login-card')?.classList.add('shake');
             setTimeout(() => {
