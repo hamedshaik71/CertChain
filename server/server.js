@@ -590,35 +590,40 @@ app.post('/api/institution/register', institutionDocUpload, async (req, res) => 
 });
 
 // ============================================================================
-// 2️⃣ STUDENT REGISTRATION
+// 2️⃣ STUDENT REGISTRATION (FIXED AUTO-FILL)
 // ============================================================================
 
 app.post('/api/student/register', async (req, res) => {
     try {
         console.log('📝 Student registration request');
 
-        // ✅ CHANGE: Use 'let' so we can auto-fill institutionCode if missing
+        // 1. Destructure inputs (use 'let' to allow overwriting)
         let { email, fullName, password, institutionCode } = req.body;
 
-        // 🟢 NEW LOGIC: Auto-fill Institution Code from Token
-        // If the user didn't provide a code, check if they are a logged-in Institution
-        if (!institutionCode && req.headers.authorization) {
+        // ------------------------------------------------------------------
+        // 🟢 AUTO-FILL LOGIC: Get Code from Token if missing in body
+        // ------------------------------------------------------------------
+        if ((!institutionCode || institutionCode.trim() === "") && req.headers.authorization) {
             try {
                 const token = req.headers.authorization.split(' ')[1];
                 if (token) {
+                    // Verify token to get payload
                     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key');
-                    // If the token belongs to an institution, use their code
-                    if (decoded.role === 'institution' && decoded.institutionCode) {
+                    
+                    // If token has institutionCode, use it!
+                    if (decoded.institutionCode) {
                         institutionCode = decoded.institutionCode;
-                        console.log(`🤖 Auto-filled Institution Code from Token: ${institutionCode}`);
+                        console.log(`🔑 Auto-filled Institution Code from Token: ${institutionCode}`);
                     }
                 }
             } catch (tokenError) {
-                // Ignore errors here (it might be a student registering publicly without a token)
+                console.warn('⚠️ Token auto-fill failed:', tokenError.message);
+                // Continue execution; maybe the user intends to fail validation or entered data manually
             }
         }
+        // ------------------------------------------------------------------
 
-        // 🔴 VALIDATION (Runs after auto-fill attempt)
+        // 2. Validate Fields (After auto-fill attempt)
         if (!email || !fullName || !password || !institutionCode) {
             return res.status(400).json({
                 success: false,
@@ -627,15 +632,13 @@ app.post('/api/student/register', async (req, res) => {
             });
         }
 
-        // Check institution exists and is approved
+        // 3. Clean and Standardize Code
+        const cleanInstCode = institutionCode.toString().trim().toUpperCase();
+
+        // 4. Check Institution Status in MongoDB
         let institution = null;
         try {
-            // Trim whitespace to ensure match
-            const cleanCode = institutionCode.trim();
-            institution = await Institution.findOne({ institutionCode: cleanCode });
-            
-            // Update the variable to be the clean version
-            institutionCode = cleanCode;
+            institution = await Institution.findOne({ institutionCode: cleanInstCode });
         } catch (dbErr) {
             console.warn('⚠️ MongoDB lookup failed, continuing with JSON only');
         }
@@ -648,20 +651,19 @@ app.post('/api/student/register', async (req, res) => {
             });
         }
 
-        // ✅ Save to JSON file FIRST (guaranteed persistence)
+        // 5. Save to JSON File (Backup/Persistence)
         let jsonStudent;
         try {
             jsonStudent = StudentStorage.register({
                 email,
                 fullName,
                 password,
-                institutionCode,
-                institutionName: institution?.name || institutionCode,
-                institutionAddress: institution?.blockchain?.walletAddress || institution?.email || institutionCode
+                institutionCode: cleanInstCode,
+                institutionName: institution?.name || cleanInstCode,
+                institutionAddress: institution?.blockchain?.walletAddress || institution?.email || cleanInstCode
             });
             console.log(`✅ [JSON] Student saved: ${jsonStudent.email}`);
         } catch (jsonError) {
-            // Check if duplicate
             if (jsonError.message.includes('ALREADY_REGISTERED') || jsonError.message.includes('EXISTS')) {
                 return res.status(400).json({
                     success: false,
@@ -672,7 +674,7 @@ app.post('/api/student/register', async (req, res) => {
             throw jsonError;
         }
 
-        // ✅ ALSO save to MongoDB (best effort)
+        // 6. Save to MongoDB (Main Database)
         let mongoStudent = null;
         try {
             const existing = await Student.findOne({ email: email.toLowerCase() });
@@ -681,20 +683,27 @@ app.post('/api/student/register', async (req, res) => {
                     studentCode: jsonStudent.studentCode,
                     email: email.toLowerCase(),
                     fullName,
-                    // 👇 This ensures the code is saved in MongoDB for future queries
-                    institutionCode: institutionCode, 
-                    institutionAddress: institution?.blockchain?.walletAddress || institution?.email || institutionCode,
-                    institutionName: institution?.name || institutionCode
+                    // ✅ CRITICAL: Explicitly setting the code we found/cleaned
+                    institutionCode: cleanInstCode, 
+                    institutionAddress: institution?.blockchain?.walletAddress || institution?.email || cleanInstCode,
+                    institutionName: institution?.name || cleanInstCode
                 });
                 mongoStudent.setPassword(password);
                 await mongoStudent.save();
-                console.log(`✅ [MongoDB] Student also saved to database`);
+                console.log(`✅ [MongoDB] Student saved with Institution Code: ${cleanInstCode}`);
             }
         } catch (mongoError) {
             console.warn(`⚠️ [MongoDB] Save failed (JSON backup exists): ${mongoError.message}`);
+            // If it's a validation error, we must report it to client
+            if (mongoError.name === 'ValidationError') {
+                return res.status(500).json({
+                    success: false,
+                    message: `Database Validation Error: ${mongoError.message}`
+                });
+            }
         }
 
-        // Update institution stats
+        // 7. Update Institution Stats
         try {
             if (institution && institution.statistics) {
                 institution.statistics.studentsEnrolled = (institution.statistics.studentsEnrolled || 0) + 1;
@@ -704,9 +713,9 @@ app.post('/api/student/register', async (req, res) => {
             console.warn('⚠️ Could not update institution stats');
         }
 
-        console.log(`✅ Student registered successfully: ${jsonStudent.studentCode}`);
-        console.log(`📊 Total students in JSON: ${StudentStorage.count()}`);
-
+        // 8. Return Success
+        console.log(`✅ Registration Complete: ${jsonStudent.studentCode}`);
+        
         res.json({
             success: true,
             message: 'Registration successful!',
@@ -715,7 +724,7 @@ app.post('/api/student/register', async (req, res) => {
                 studentCode: jsonStudent.studentCode,
                 fullName: jsonStudent.fullName,
                 email: jsonStudent.email,
-                institutionCode: institutionCode, 
+                institutionCode: cleanInstCode, // Send back the code used
                 institutionName: jsonStudent.institutionName
             }
         });
