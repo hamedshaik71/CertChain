@@ -597,8 +597,28 @@ app.post('/api/student/register', async (req, res) => {
     try {
         console.log('📝 Student registration request');
 
-        const { email, fullName, password, institutionCode } = req.body;
+        // ✅ CHANGE: Use 'let' so we can auto-fill institutionCode if missing
+        let { email, fullName, password, institutionCode } = req.body;
 
+        // 🟢 NEW LOGIC: Auto-fill Institution Code from Token
+        // If the user didn't provide a code, check if they are a logged-in Institution
+        if (!institutionCode && req.headers.authorization) {
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                if (token) {
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key');
+                    // If the token belongs to an institution, use their code
+                    if (decoded.role === 'institution' && decoded.institutionCode) {
+                        institutionCode = decoded.institutionCode;
+                        console.log(`🤖 Auto-filled Institution Code from Token: ${institutionCode}`);
+                    }
+                }
+            } catch (tokenError) {
+                // Ignore errors here (it might be a student registering publicly without a token)
+            }
+        }
+
+        // 🔴 VALIDATION (Runs after auto-fill attempt)
         if (!email || !fullName || !password || !institutionCode) {
             return res.status(400).json({
                 success: false,
@@ -610,7 +630,12 @@ app.post('/api/student/register', async (req, res) => {
         // Check institution exists and is approved
         let institution = null;
         try {
-            institution = await Institution.findOne({ institutionCode });
+            // Trim whitespace to ensure match
+            const cleanCode = institutionCode.trim();
+            institution = await Institution.findOne({ institutionCode: cleanCode });
+            
+            // Update the variable to be the clean version
+            institutionCode = cleanCode;
         } catch (dbErr) {
             console.warn('⚠️ MongoDB lookup failed, continuing with JSON only');
         }
@@ -656,7 +681,7 @@ app.post('/api/student/register', async (req, res) => {
                     studentCode: jsonStudent.studentCode,
                     email: email.toLowerCase(),
                     fullName,
-                    // 👇 THIS WAS MISSING! I ADDED IT SO QUERY WORKS LATER
+                    // 👇 This ensures the code is saved in MongoDB for future queries
                     institutionCode: institutionCode, 
                     institutionAddress: institution?.blockchain?.walletAddress || institution?.email || institutionCode,
                     institutionName: institution?.name || institutionCode
@@ -690,7 +715,7 @@ app.post('/api/student/register', async (req, res) => {
                 studentCode: jsonStudent.studentCode,
                 fullName: jsonStudent.fullName,
                 email: jsonStudent.email,
-                institutionCode: institutionCode, // Ensure frontend receives this
+                institutionCode: institutionCode, 
                 institutionName: jsonStudent.institutionName
             }
         });
