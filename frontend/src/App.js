@@ -2700,16 +2700,14 @@ const response = await axios.post(
                         
                         {/* ✅ LINK TO INTERNAL VIEWER */}
                         {/* ✅ FIXED LINK */}
-<a 
-    // ✅ Add query param with course name
-    href={`/nft/${String(displayTokenId)}?name=${encodeURIComponent(certificate.courseName)}&org=${encodeURIComponent(certificate.institutionName)}`}
-    target="_blank" 
-    rel="noopener noreferrer"
+<Link 
+    // ✅ USE 'TO', NOT 'HREF'
+    to={`/nft/${String(displayTokenId)}?name=${encodeURIComponent(certificate.courseName)}&org=${encodeURIComponent(certificate.institutionName)}`}
     className="opensea-link"
-    style={{/* styles */}}
+    style={{/* your styles */}}
 >
     💎 View NFT Asset
-</a>
+</Link>
                     </div>
                 ) : (
                     <button
