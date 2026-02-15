@@ -2621,16 +2621,19 @@ function NFTCertificateCard({ certificate, onMint }) {
             return;
         }
 
-        // 2. Call Backend (Simulated Route)
-        const response = await axios.post(
-            'http://localhost:5000/api/nft/mint', 
-            {
-                certificateHash: certificate.certificateHash,
-                studentCode: certificate.studentCode,
-                studentWalletAddress: "0x" + Array(40).fill(0).map(()=>Math.floor(Math.random()*16).toString(16)).join('')
-            },
-            { headers: { 'Authorization': `Bearer ${token}` } } // ✅ Token Header
-        );
+        // ✅ FIX: Use correct API URL instead of localhost
+const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+
+// 2. Call Backend (Simulated Route)
+const response = await axios.post(
+    `${API_URL}/api/nft/mint`, 
+    {
+        certificateHash: certificate.certificateHash,
+        studentCode: certificate.studentCode,
+        studentWalletAddress: "0x" + Array(40).fill(0).map(()=>Math.floor(Math.random()*16).toString(16)).join('')
+    },
+    { headers: { 'Authorization': `Bearer ${token}` } } // ✅ Token Header
+);
 
         if (response.data.success) {
             setStatus("success");
@@ -3075,17 +3078,20 @@ function StudentDashboard({ userData, onLogout, addNotification }) {
     };
 
     const fetchBadges = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/badges/student/${userData?.studentCode}`
-            );
-            if (response.data.success) {
-                setBadges(response.data.badges || []);
-            }
-        } catch (error) {
-            console.error('Error fetching badges:', error);
+    try {
+        // ✅ FIX: Use correct API URL instead of localhost
+        const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+        
+        const response = await axios.get(
+            `${API_URL}/api/badges/student/${userData?.studentCode}`
+        );
+        if (response.data.success) {
+            setBadges(response.data.badges || []);
         }
-    };
+    } catch (error) {
+        console.error('Error fetching badges:', error);
+    }
+};
 
     const skills = [
         { name: 'Web Development', level: 85, icon: '🌐', certificates: 3, badges: 2 },
@@ -4039,15 +4045,18 @@ function AIResumeVerifier({ addNotification }) {
             formData.append('resume', file);
             if (email) formData.append('studentEmail', email);
 
-            const response = await axios.post(
-                'http://localhost:5000/api/resume/verify',
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            );
+           // ✅ FIX: Use correct API URL instead of localhost
+const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+
+const response = await axios.post(
+    `${API_URL}/api/resume/verify`,
+    formData,
+    {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+);
 
             if (response.data.success) {
                 setReport(response.data.report);
@@ -4405,23 +4414,26 @@ function SkillBadges({ studentCode }) {
     }, []);
 
     const fetchBadges = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/badges/student/${studentCode}`
-            );
-            if (response.data.success && response.data.badges?.length > 0) {
-                setBadges(response.data.badges);
-            } else {
-                setBadges(defaultBadges);
-            }
-        } catch (error) {
-            console.error('Error fetching badges, using defaults:', error);
+    setLoading(true);
+    try {
+        // ✅ FIX: Use correct API URL instead of localhost
+        const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+        
+        const response = await axios.get(
+            `${API_URL}/api/badges/student/${studentCode}`
+        );
+        if (response.data.success && response.data.badges?.length > 0) {
+            setBadges(response.data.badges);
+        } else {
             setBadges(defaultBadges);
-        } finally {
-            setLoading(false);
         }
-    };
+    } catch (error) {
+        console.error('Error fetching badges, using defaults:', error);
+        setBadges(defaultBadges);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const getRarityClass = (rarity) => {
         switch (rarity) {

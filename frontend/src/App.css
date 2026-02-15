@@ -8820,3 +8820,23 @@ select.form-input {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+/* Fix for transparent blockchain text */
+.blockchain-status .status-header span {
+    color: #2c3e50 !important;
+}
+
+.blockchain-details .detail-row .detail-label {
+    color: #666666 !important;
+}
+
+.blockchain-details .detail-row .detail-value {
+    color: #2c3e50 !important;
+}
+
+.blockchain-details .detail-row code {
+    color: #2c3e50 !important;
+}
+
+.blockchain-status span {
+    color: #2c3e50 !important;
+}
