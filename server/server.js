@@ -656,6 +656,8 @@ app.post('/api/student/register', async (req, res) => {
                     studentCode: jsonStudent.studentCode,
                     email: email.toLowerCase(),
                     fullName,
+                    // 👇 THIS WAS MISSING! I ADDED IT SO QUERY WORKS LATER
+                    institutionCode: institutionCode, 
                     institutionAddress: institution?.blockchain?.walletAddress || institution?.email || institutionCode,
                     institutionName: institution?.name || institutionCode
                 });
@@ -688,6 +690,7 @@ app.post('/api/student/register', async (req, res) => {
                 studentCode: jsonStudent.studentCode,
                 fullName: jsonStudent.fullName,
                 email: jsonStudent.email,
+                institutionCode: institutionCode, // Ensure frontend receives this
                 institutionName: jsonStudent.institutionName
             }
         });
@@ -701,7 +704,6 @@ app.post('/api/student/register', async (req, res) => {
         });
     }
 });
-
 // ============================================================================
 // 3️⃣ STUDENT LOGIN
 // ============================================================================

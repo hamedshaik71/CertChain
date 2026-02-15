@@ -33,6 +33,14 @@ const studentSchema = new mongoose.Schema({
     dateOfBirth: {
         type: Date
     },
+    
+    // ✅ ADDED THIS MISSING FIELD 👇
+    institutionCode: {
+        type: String,
+        required: true,
+        index: true
+    },
+    
     institutionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Institution'
@@ -128,16 +136,15 @@ const studentSchema = new mongoose.Schema({
 studentSchema.index({ email: 1, studentCode: 1 });
 studentSchema.index({ institutionId: 1, status: 1 });
 studentSchema.index({ institutionAddress: 1 });
+studentSchema.index({ institutionCode: 1 }); // ✅ Added index for institutionCode
 
 // Pre-save middleware
 studentSchema.pre('save', function(next) {
     this.updatedAt = new Date();
-    
     // Sync name with fullName
     if (this.fullName && !this.name) {
         this.name = this.fullName;
     }
-    
     next();
 });
 
@@ -167,12 +174,10 @@ studentSchema.methods.verifyPassword = function(password) {
     return this.passwordHash === hash;
 };
 
-// Compare password (alias for verifyPassword)
 studentSchema.methods.comparePassword = function(password) {
     return this.verifyPassword(password);
 };
 
-// Get public profile (safe to send to client)
 studentSchema.methods.getPublicProfile = function() {
     return {
         id: this._id,
@@ -182,6 +187,7 @@ studentSchema.methods.getPublicProfile = function() {
         email: this.email,
         phone: this.phone,
         institutionName: this.institutionName,
+        institutionCode: this.institutionCode, // ✅ Added to public profile
         department: this.department,
         program: this.program,
         status: this.status,
@@ -192,26 +198,22 @@ studentSchema.methods.getPublicProfile = function() {
     };
 };
 
-// Generate verification token
 studentSchema.methods.generateVerificationToken = function() {
     this.verificationToken = crypto.randomBytes(32).toString('hex');
-    this.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    this.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); 
     return this.verificationToken;
 };
 
-// Generate password reset token
 studentSchema.methods.generateResetToken = function() {
     this.resetPasswordToken = crypto.randomBytes(32).toString('hex');
-    this.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    this.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); 
     return this.resetPasswordToken;
 };
 
-// Virtual for certificate count
 studentSchema.virtual('certificateCount').get(function() {
     return this.certificates ? this.certificates.length : 0;
 });
 
-// Ensure virtuals are included in JSON
 studentSchema.set('toJSON', { virtuals: true });
 studentSchema.set('toObject', { virtuals: true });
 
