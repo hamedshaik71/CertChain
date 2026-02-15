@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Certificate = require('../models/Certificate');
 const Student = require('../models/Student');
+// ✅ ADDED THESE IMPORTS to fix registration logic
+const Institution = require('../models/Institution');
+const { StudentStorage } = require('../services/jsonStorage'); 
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
@@ -205,10 +208,11 @@ router.get('/download/:hash', async (req, res) => {
 
 // ==================== STUDENT AUTH ROUTES ====================
 
-// Student Registration
+// Student Registration (UPDATED TO AUTO-FILL INSTITUTION CODE)
 router.post('/register', async (req, res) => {
     try {
-        const { 
+        // Use 'let' so we can overwrite institutionCode if found in token
+        let { 
             studentCode, 
             fullName, 
             email, 
@@ -216,16 +220,63 @@ router.post('/register', async (req, res) => {
             phone,
             institutionId,
             institutionAddress,
+            institutionCode, // This might be missing initially
             institutionName,
             program,
             department
         } = req.body;
+
+        // 🟢 FIX: AUTO-FILL LOGIC
+        // If institutionCode is missing, try to extract it from the Authorization Token
+        if ((!institutionCode || institutionCode.trim() === "") && req.headers.authorization) {
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                if (token) {
+                    const decoded = jwt.verify(token, JWT_SECRET);
+                    // Check if token belongs to an Institution
+                    if (decoded.role === 'institution' && decoded.institutionCode) {
+                        institutionCode = decoded.institutionCode;
+                        console.log(`🔑 Auto-filled Institution Code: ${institutionCode}`);
+                        
+                        // Also auto-fill name if missing
+                        if (!institutionName) institutionName = decoded.name;
+                    }
+                }
+            } catch (err) {
+                console.warn("Token check failed in register:", err.message);
+            }
+        }
 
         // Validate required fields
         if (!email || !fullName) {
             return res.status(400).json({
                 success: false,
                 message: 'Email and full name are required'
+            });
+        }
+
+        // Now validate Institution Code (after auto-fill attempt)
+        if (!institutionCode) {
+            return res.status(400).json({
+                success: false,
+                message: 'Institution Code is required'
+            });
+        }
+
+        const cleanInstCode = institutionCode.toString().trim().toUpperCase();
+
+        // 4. Verify Institution exists in DB
+        let institutionObj = null;
+        try {
+            institutionObj = await Institution.findOne({ institutionCode: cleanInstCode });
+        } catch (e) {
+            console.warn('DB Institution lookup failed');
+        }
+
+        if (institutionObj && institutionObj.status.application !== 'APPROVED') {
+            return res.status(403).json({
+                success: false,
+                message: 'Institution is not approved yet'
             });
         }
 
@@ -253,9 +304,11 @@ router.post('/register', async (req, res) => {
             fullName,
             email: email.toLowerCase(),
             phone,
-            institutionId,
-            institutionAddress,
-            institutionName,
+            // ✅ CRITICAL FIX: Ensure institutionCode is saved to DB
+            institutionCode: cleanInstCode,
+            institutionId: institutionId || institutionObj?._id,
+            institutionAddress: institutionAddress || institutionObj?.email || cleanInstCode,
+            institutionName: institutionName || institutionObj?.name || cleanInstCode,
             program,
             department,
             status: 'ACTIVE'
@@ -268,6 +321,21 @@ router.post('/register', async (req, res) => {
 
         // Generate verification token
         student.generateVerificationToken();
+
+        // Optional: Save to JSON storage backup if available
+        try {
+            if (StudentStorage) {
+                StudentStorage.register({
+                    email, 
+                    fullName, 
+                    password,
+                    institutionCode: cleanInstCode,
+                    studentCode: finalStudentCode,
+                    institutionName: student.institutionName,
+                    institutionAddress: student.institutionAddress
+                });
+            }
+        } catch(e) { console.warn("JSON backup skipped"); }
 
         await student.save();
 
@@ -362,7 +430,8 @@ router.post('/login', async (req, res) => {
                 fullName: student.fullName,
                 role: 'student',
                 institutionAddress: student.institutionAddress,
-                institutionName: student.institutionName
+                institutionName: student.institutionName,
+                institutionCode: student.institutionCode
             },
             JWT_SECRET,
             { expiresIn: '30d' }
@@ -664,362 +733,47 @@ function generateCertificateHTML(certificate, verifyUrl) {
     <title>Certificate - ${certificate.courseName}</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .certificate-wrapper {
-            background: white;
-            max-width: 900px;
-            width: 100%;
-            position: relative;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.4);
-        }
-        
-        .certificate {
-            padding: 60px;
-            position: relative;
-        }
-        
-        /* Decorative borders */
-        .certificate::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-            border: 3px solid #667eea;
-        }
-        
-        .certificate::after {
-            content: '';
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            right: 25px;
-            bottom: 25px;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-        
-        /* Header */
-        .header {
-            margin-bottom: 40px;
-        }
-        
-        .logo {
-            font-size: 70px;
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .title {
-            font-family: 'Playfair Display', serif;
-            font-size: 48px;
-            color: #1a202c;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            color: #667eea;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-        
-        /* Main content */
-        .main-content {
-            margin: 50px 0;
-        }
-        
-        .presented-to {
-            font-size: 14px;
-            color: #6b7280;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-        
-        .student-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 52px;
-            color: #1a202c;
-            font-weight: 700;
-            margin-bottom: 30px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .student-name::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #667eea, transparent);
-        }
-        
-        .course-section {
-            margin: 40px 0;
-        }
-        
-        .course-label {
-            font-size: 14px;
-            color: #6b7280;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-        
-        .course-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            color: #374151;
-            font-weight: 600;
-        }
-        
-        /* Details grid */
-        .details {
-            display: flex;
-            justify-content: center;
-            gap: 60px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-        
-        .detail-item {
-            text-align: center;
-            min-width: 150px;
-        }
-        
-        .detail-label {
-            font-size: 11px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-        
-        .detail-value {
-            font-size: 18px;
-            color: #1a202c;
-            font-weight: 600;
-        }
-        
-        /* Blockchain badge */
-        .blockchain-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 14px 30px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-        
-        /* Verification section */
-        .verification {
-            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-            border: 1px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 40px;
-            text-align: left;
-        }
-        
-        .verification-title {
-            font-size: 14px;
-            color: #374151;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .verification-title::before {
-            content: '🔐';
-            font-size: 20px;
-        }
-        
-        .hash-container {
-            margin: 15px 0;
-        }
-        
-        .hash-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 5px;
-        }
-        
-        .hash {
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-            font-size: 12px;
-            color: #667eea;
-            word-break: break-all;
-            background: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .verify-link-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .verify-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            padding: 10px 20px;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .verify-link:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        /* Footer */
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-        }
-        
-        .signature {
-            display: inline-block;
-            min-width: 280px;
-            border-top: 2px solid #1a202c;
-            padding-top: 15px;
-        }
-        
-        .signature-name {
-            font-weight: 600;
-            color: #1a202c;
-            font-size: 16px;
-        }
-        
-        .signature-title {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 5px;
-        }
-        
-        /* Print button */
-        .print-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-        
-        .print-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
-        }
-        
-        /* Print styles */
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            
-            .certificate-wrapper {
-                box-shadow: none;
-                max-width: 100%;
-            }
-            
-            .print-btn {
-                display: none !important;
-            }
-            
-            .logo {
-                animation: none;
-            }
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .certificate {
-                padding: 30px;
-            }
-            
-            .title {
-                font-size: 32px;
-                letter-spacing: 4px;
-            }
-            
-            .student-name {
-                font-size: 36px;
-            }
-            
-            .course-name {
-                font-size: 24px;
-            }
-            
-            .details {
-                gap: 30px;
-            }
-            
-            .logo {
-                font-size: 50px;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Open Sans', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .certificate-wrapper { background: white; max-width: 900px; width: 100%; position: relative; box-shadow: 0 30px 100px rgba(0, 0, 0, 0.4); }
+        .certificate { padding: 60px; position: relative; }
+        .certificate::before { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 3px solid #667eea; }
+        .certificate::after { content: ''; position: absolute; top: 25px; left: 25px; right: 25px; bottom: 25px; border: 1px solid #e5e7eb; }
+        .content { position: relative; z-index: 1; text-align: center; }
+        .header { margin-bottom: 40px; }
+        .logo { font-size: 70px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .title { font-family: 'Playfair Display', serif; font-size: 48px; color: #1a202c; font-weight: 700; text-transform: uppercase; letter-spacing: 8px; margin-bottom: 10px; }
+        .subtitle { font-size: 16px; color: #667eea; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
+        .main-content { margin: 50px 0; }
+        .presented-to { font-size: 14px; color: #6b7280; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; }
+        .student-name { font-family: 'Playfair Display', serif; font-size: 52px; color: #1a202c; font-weight: 700; margin-bottom: 30px; position: relative; display: inline-block; }
+        .student-name::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60%; height: 3px; background: linear-gradient(90deg, transparent, #667eea, transparent); }
+        .course-section { margin: 40px 0; }
+        .course-label { font-size: 14px; color: #6b7280; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .course-name { font-family: 'Playfair Display', serif; font-size: 32px; color: #374151; font-weight: 600; }
+        .details { display: flex; justify-content: center; gap: 60px; margin: 40px 0; flex-wrap: wrap; }
+        .detail-item { text-align: center; min-width: 150px; }
+        .detail-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .detail-value { font-size: 18px; color: #1a202c; font-weight: 600; }
+        .blockchain-badge { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 30px; border-radius: 50px; font-size: 14px; font-weight: 600; margin-top: 30px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+        .verification { background: linear-gradient(135deg, #f9fafb, #f3f4f6); border: 1px solid #e5e7eb; border-radius: 16px; padding: 30px; margin-top: 40px; text-align: left; }
+        .verification-title { font-size: 14px; color: #374151; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .verification-title::before { content: '🔐'; font-size: 20px; }
+        .hash-container { margin: 15px 0; }
+        .hash-label { font-size: 12px; color: #6b7280; margin-bottom: 5px; }
+        .hash { font-family: 'Monaco', 'Menlo', 'Courier New', monospace; font-size: 12px; color: #667eea; word-break: break-all; background: white; padding: 12px 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .verify-link-container { margin-top: 20px; text-align: center; }
+        .verify-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 20px; border: 2px solid #667eea; border-radius: 8px; transition: all 0.3s ease; }
+        .verify-link:hover { background: #667eea; color: white; }
+        .footer { margin-top: 50px; text-align: center; }
+        .signature { display: inline-block; min-width: 280px; border-top: 2px solid #1a202c; padding-top: 15px; }
+        .signature-name { font-weight: 600; color: #1a202c; font-size: 16px; }
+        .signature-title { font-size: 13px; color: #6b7280; margin-top: 5px; }
+        .print-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px 32px; border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5); transition: all 0.3s ease; z-index: 100; }
+        .print-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6); }
+        @media print { body { background: white; padding: 0; } .certificate-wrapper { box-shadow: none; max-width: 100%; } .print-btn { display: none !important; } .logo { animation: none; } }
+        @media (max-width: 768px) { .certificate { padding: 30px; } .title { font-size: 32px; letter-spacing: 4px; } .student-name { font-size: 36px; } .course-name { font-size: 24px; } .details { gap: 30px; } .logo { font-size: 50px; } }
     </style>
 </head>
 <body>
