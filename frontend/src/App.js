@@ -8,6 +8,8 @@ import { QRCodeCanvas } from 'qrcode.react';
 import axios from 'axios';
 import NFTViewer from './components/NFTViewer';
 import './components/AIResumeVerifier.css';
+
+
 // Components
 import AdminLogin from './components/AdminLogin';
 import CertificateWallet from './components/CertificateWallet';
@@ -3832,8 +3834,10 @@ function SmartQRActions({ certificateHash, certificate }) {
         setTimeout(() => setActiveAction(null), 2000);
     };
 
+    // ✅ FIXED: Simple handleVerify that opens the VerifyCertificate page
     const handleVerify = () => {
         setActiveAction('verify');
+        // Opens the existing VerifyCertificate page in a new tab
         window.open(verifyUrl, '_blank');
         setTimeout(() => setActiveAction(null), 2000);
     };
@@ -3910,74 +3914,60 @@ function SmartQRActions({ certificateHash, certificate }) {
 
             {/* Action Buttons */}
             <div className="qr-actions-grid">
-    <button
-        className={`qr-action-btn view-btn ${activeAction === 'view' ? 'active' : ''}`}
-        onClick={() => {
-            setEnlarged(!enlarged);
-            setActiveAction('view');
-            setTimeout(() => setActiveAction(null), 1000);
-        }}
-    >
-        <span className="action-icon">👁️</span>
-        <span className="action-label">View</span>
-    </button>
+                <button
+                    className={`qr-action-btn view-btn ${activeAction === 'view' ? 'active' : ''}`}
+                    onClick={() => {
+                        setEnlarged(!enlarged);
+                        setActiveAction('view');
+                        setTimeout(() => setActiveAction(null), 1000);
+                    }}
+                >
+                    <span className="action-icon">👁️</span>
+                    <span className="action-label">View</span>
+                </button>
 
-    <button
-        className={`qr-action-btn download-btn ${activeAction === 'download' ? 'active' : ''}`}
-        onClick={handleDownloadQR}
-    >
-        <span className="action-icon">📥</span>
-        <span className="action-label">Download</span>
-    </button>
+                <button
+                    className={`qr-action-btn download-btn ${activeAction === 'download' ? 'active' : ''}`}
+                    onClick={handleDownloadQR}
+                >
+                    <span className="action-icon">📥</span>
+                    <span className="action-label">Download</span>
+                </button>
 
-    <button
-        className={`qr-action-btn share-btn ${activeAction === 'share' ? 'active' : ''}`}
-        onClick={handleShare}
-    >
-        <span className="action-icon">📤</span>
-        <span className="action-label">Share</span>
-    </button>
+                <button
+                    className={`qr-action-btn share-btn ${activeAction === 'share' ? 'active' : ''}`}
+                    onClick={handleShare}
+                >
+                    <span className="action-icon">📤</span>
+                    <span className="action-label">Share</span>
+                </button>
 
-    {/* ✅ VERIFY BUTTON ADDED HERE */}
-    {/* ✅ FIXED VERIFY BUTTON */}
-<button
-    className={`qr-action-btn verify-btn ${activeAction === 'verify' ? 'active' : ''}`}
-    onClick={() => {
-        setActiveAction('verify');
-        
-        // 1. Get the ID from your existing certificate data
-        // (Assuming 'certificate' or 'selectedCertificate' is the prop name in your component)
-        const certID = certificate?.certificateHash || certificate?._id; 
-        
-        // 2. Construct the link to your VerifyCertificate page
-        const verifyURL = `${window.location.origin}/verify/${certID}`;
-        
-        // 3. Open it
-        window.open(verifyURL, '_blank');
-        
-        setTimeout(() => setActiveAction(null), 1000);
-    }}
->
-    <span className="action-icon">✅</span>
-    <span className="action-label">Verify</span>
-</button>
+                {/* ✅ FIXED VERIFY BUTTON - Opens VerifyCertificate page */}
+                <button
+                    className={`qr-action-btn verify-btn ${activeAction === 'verify' ? 'active' : ''}`}
+                    onClick={handleVerify}
+                >
+                    <span className="action-icon">✅</span>
+                    <span className="action-label">Verify</span>
+                </button>
 
-    <button
-        className={`qr-action-btn linkedin-btn ${activeAction === 'linkedin' ? 'active' : ''}`}
-        onClick={handleLinkedIn}
-    >
-        <span className="action-icon">💼</span>
-        <span className="action-label">LinkedIn</span>
-    </button>
+                <button
+                    className={`qr-action-btn linkedin-btn ${activeAction === 'linkedin' ? 'active' : ''}`}
+                    onClick={handleLinkedIn}
+                >
+                    <span className="action-icon">💼</span>
+                    <span className="action-label">LinkedIn</span>
+                </button>
 
-    <button
-        className={`qr-action-btn save-btn ${activeAction === 'save' ? 'active' : ''}`}
-        onClick={handleSaveQR}
-    >
-        <span className="action-icon">💾</span>
-        <span className="action-label">Save QR</span>
-    </button>
-</div>
+                <button
+                    className={`qr-action-btn save-btn ${activeAction === 'save' ? 'active' : ''}`}
+                    onClick={handleSaveQR}
+                >
+                    <span className="action-icon">💾</span>
+                    <span className="action-label">Save QR</span>
+                </button>
+            </div>
+
             {/* Certificate Hash Info */}
             <div className="cert-hash-info">
                 <span className="hash-label">🔐 Certificate Hash</span>
@@ -4634,12 +4624,14 @@ function App() {
         <Router>
             <ThemeProvider>
                 <Routes>
-                    {/* 🔐 Certificate verification route - must come first */}
+                    {/* 🔐 Certificate verification route */}
                     <Route path="/verify/:hash" element={<VerifyCertificate />} />
                     
-                    {/* 🏠 All other routes - home, dashboard, etc. */}
-                    <Route path="*" element={<AppContent />} />
+                    {/* 🎨 NFT Viewer route */}
                     <Route path="/nft/:tokenId" element={<NFTViewer />} />
+                    
+                    {/* 🏠 All other routes - home, dashboard, etc. (MUST BE LAST) */}
+                    <Route path="*" element={<AppContent />} />
                 </Routes>
             </ThemeProvider>
         </Router>

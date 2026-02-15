@@ -15,7 +15,7 @@ const VerifyCertificate = () => {
     const [viewerInfo, setViewerInfo] = useState({});
     const [verificationTime, setVerificationTime] = useState(null);
 
-    const SERVER_URL = 'http://localhost:5000';
+    const SERVER_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
 
     useEffect(() => {
         captureViewerInfo();
