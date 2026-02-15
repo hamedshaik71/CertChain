@@ -1807,13 +1807,17 @@ function AdminDashboard({ userData, onLogout, addNotification }) {
     try {
         const token = localStorage.getItem('token');
 
-        const response = await fetch('http://localhost:5000/api/admin/process-certificate', {
+        // ✅ FIX 1: Use correct API URL (not localhost)
+        const API_URL = process.env.REACT_APP_API_URL || 'https://certchain-api.onrender.com';
+
+        const response = await fetch(`${API_URL}/api/admin/process-certificate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: ({
+            // ✅ FIX 2: Added JSON.stringify()
+            body: JSON.stringify({
                 certificateId: actionModal.cert._id,
                 action: actionModal.type,
                 comments:
@@ -1825,13 +1829,13 @@ function AdminDashboard({ userData, onLogout, addNotification }) {
 
         let data;
 
-try {
-   const text = await response.text();
-   data = text ? JSON.parse(text) : {};
-} catch (err) {
-   console.error("💀 Invalid JSON response:", err);
-   data = { success: false, error: "INVALID_SERVER_RESPONSE" };
-}
+        try {
+            const text = await response.text();
+            data = text ? JSON.parse(text) : {};
+        } catch (err) {
+            console.error("💀 Invalid JSON response:", err);
+            data = { success: false, error: "INVALID_SERVER_RESPONSE" };
+        }
 
 
         if (data.success) {
@@ -1873,13 +1877,14 @@ try {
         try {
             const response = await api.request('/api/admin/process-certificate', {
                 method: 'POST',
-                body: ({
+                // ✅ FIX 3: Removed parentheses, api.request handles JSON.stringify internally
+                body: {
                     certificateId: cert._id,
                     action: action, // 'APPROVE' or 'REJECT'
                     comments: action === 'APPROVE'
                         ? `Approved by ${userData?.email || 'admin'}`
                         : `Rejected by ${userData?.email || 'admin'}`
-                })
+                }
             });
 
             if (response.success) {
