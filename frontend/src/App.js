@@ -2700,14 +2700,16 @@ const response = await axios.post(
                         
                         {/* ✅ LINK TO INTERNAL VIEWER */}
                         {/* ✅ FIXED LINK */}
-<Link 
-    // ✅ USE 'TO', NOT 'HREF'
-    to={`/nft/${String(displayTokenId)}?name=${encodeURIComponent(certificate.courseName)}&org=${encodeURIComponent(certificate.institutionName)}`}
+<a 
+    // ✅ Add query param with course name
+    href={`/nft/${String(displayTokenId)}?name=${encodeURIComponent(certificate.courseName)}&org=${encodeURIComponent(certificate.institutionName)}`}
+    target="_blank" 
+    rel="noopener noreferrer"
     className="opensea-link"
-    style={{/* your styles */}}
+    style={{/* styles */}}
 >
     💎 View NFT Asset
-</Link>
+</a>
                     </div>
                 ) : (
                     <button
@@ -4622,14 +4624,12 @@ function App() {
         <Router>
             <ThemeProvider>
                 <Routes>
-                    {/* 🔐 Certificate verification route */}
+                    {/* 🔐 Certificate verification route - must come first */}
                     <Route path="/verify/:hash" element={<VerifyCertificate />} />
                     
-                    {/* 🎨 NFT Viewer route */}
-                    <Route path="/nft/:tokenId" element={<NFTViewer />} />
-                    
-                    {/* 🏠 All other routes - home, dashboard, etc. (MUST BE LAST) */}
+                    {/* 🏠 All other routes - home, dashboard, etc. */}
                     <Route path="*" element={<AppContent />} />
+                    <Route path="/nft/:tokenId" element={<NFTViewer />} />
                 </Routes>
             </ThemeProvider>
         </Router>
