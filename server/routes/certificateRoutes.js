@@ -299,6 +299,92 @@ router.get('/verify/:hash', async (req, res) => {
     }
 });
 
+// ============================================================================
+// ✅ PUBLIC VERIFICATION ROUTE (Alias for /api/public/verify/:hash)
+// ============================================================================
+router.get('/public/verify/:hash', async (req, res) => {
+    try {
+        let { hash } = req.params;
+        hash = hash.trim();
+
+        console.log(`🔍 Public Verification Request: ${hash}`);
+
+        // 1️⃣ CHECK JSON LEDGER FIRST
+        let mockLedger = [];
+        try {
+            const ledgerPath = path.join(__dirname, '../mockBlockchain.json');
+            if (fs.existsSync(ledgerPath)) {
+                const data = fs.readFileSync(ledgerPath, 'utf8');
+                mockLedger = JSON.parse(data);
+            }
+        } catch(e) {
+            console.error("Ledger Read Error:", e);
+        }
+
+        const ledgerCert = mockLedger.find(c => 
+            c.certificateHash === hash || 
+            c.sha256Hash === hash || 
+            c.transactionHash === hash
+        );
+
+        if (ledgerCert) {
+            console.log("✅ Found in JSON Ledger");
+            return res.json({
+                success: true,
+                isValid: true,
+                blockchainVerified: true,
+                source: "LEDGER",
+                certificate: ledgerCert
+            });
+        }
+
+        // 2️⃣ CHECK DATABASE
+        const certificate = await Certificate.findOne({
+            $or: [
+                { certificateHash: { $regex: new RegExp(`^${hash}$`, 'i') } },
+                { sha256: hash },
+                { transactionHash: hash },
+                { _id: hash.match(/^[0-9a-fA-F]{24}$/) ? hash : null }
+            ]
+        });
+
+        if (!certificate) {
+            console.log("❌ Certificate not found");
+            return res.status(404).json({
+                success: false,
+                message: "Certificate not found",
+                isValid: false
+            });
+        }
+
+        const isValid = certificate.status === 'ISSUED';
+
+        res.json({
+            success: true,
+            isValid,
+            source: "DATABASE",
+            certificate: {
+                id: certificate._id,
+                certificateHash: certificate.certificateHash || certificate._id,
+                studentName: certificate.studentName,
+                studentEmail: certificate.studentEmail,
+                courseName: certificate.courseName,
+                institutionName: certificate.institutionName,
+                grade: certificate.grade,
+                issueDate: certificate.issueDate,
+                status: certificate.status,
+                sha256Hash: certificate.sha256,
+                transactionHash: certificate.transactionHash,
+                fileData: certificate.fileData
+            }
+        });
+
+    } catch (error) {
+        console.error('Public Verify Error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // Get certificate by ID
 router.get('/:id', authMiddleware, async (req, res) => {
     try {

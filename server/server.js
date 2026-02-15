@@ -67,20 +67,28 @@ app.options('*', cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ✅ Mount Route Modules HERE (after app and middleware are ready)
+// ============ MOUNT ROUTE MODULES ============
+// ✅ Each route should be registered ONCE with correct path
+
+// Public routes (for public verification)
 app.use('/api/public', publicRoutes);
+
+// Certificate routes (all certificate operations)
 app.use('/api/certificates', certificateRoutes);
-app.use('/api/certificates', studentRoutes);
 
+// Student routes (student-specific endpoints)
+app.use('/api/student', studentRoutes);  // ← Changed from /api/certificates to /api/student
+
+// Blockchain routes
 app.use('/api/blockchain', blockchainRoutes);
 
-app.use('/api/public', publicRoutes);
-app.use('/api/certificate', certificateRoutes);
-app.use('/api/certificates', studentRoutes);
-app.use('/api/blockchain', blockchainRoutes);
-
+// NFT routes
 app.use('/api/nft', nftRoutes);
-app.use('/api/badges', badgeRoutes); 
+
+// Badge routes
+app.use('/api/badges', badgeRoutes);
+
+// Resume verification routes
 app.use('/api/resume', resumeRoutes);
 
 // ============ FILE UPLOAD SETUP ============
