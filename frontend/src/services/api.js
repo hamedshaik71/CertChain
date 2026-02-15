@@ -13,7 +13,6 @@ const api = {
                 ...options.headers,
             },
             mode: 'cors',
-            credentials: 'include',
         };
 
         if (options.body) {
@@ -88,7 +87,6 @@ const api = {
                 headers: { ...(token && { Authorization: `Bearer ${token}` }) },
                 body: formData,
                 mode: 'cors',
-                credentials: 'include',
             });
             
             const text = await response.text();
@@ -132,7 +130,6 @@ const api = {
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,
                 mode: 'cors',
-                credentials: 'include',
             });
             
             const text = await response.text();
