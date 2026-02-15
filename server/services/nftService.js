@@ -87,11 +87,14 @@ class NFTService {
 
     // Generate NFT metadata
     generateMetadata(certificate) {
+        // ✅ FIX: Use API_URL instead of localhost
+        const API_URL = process.env.API_URL || process.env.SERVER_URL || 'https://certchain-api.onrender.com';
+        
         return {
             name: `${certificate.courseName} Certificate`,
             description: `Certificate awarded to ${certificate.studentName} for completing ${certificate.courseName} with grade ${certificate.grade}`,
-            image: certificate.cloudinaryUrl || `http://localhost:5000/api/certificate/file/${certificate.certificateHash}`,
-            external_url: `http://localhost:5000/certificate/${certificate.certificateHash}`,
+            image: certificate.cloudinaryUrl || `${API_URL}/api/certificate/file/${certificate.certificateHash}`,
+            external_url: `${API_URL}/certificate/${certificate.certificateHash}`,
             attributes: [
                 { trait_type: "Student Name", value: certificate.studentName },
                 { trait_type: "Course", value: certificate.courseName },
