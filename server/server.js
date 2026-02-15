@@ -2664,7 +2664,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 catch-all (MUST be after ALL route definitions)
-app.use('/api/*', (req, res) => {
+app.use((req, res) => {
     res.status(404).json({
         error: 'ENDPOINT_NOT_FOUND',
         message: `No route found for ${req.method} ${req.originalUrl}`

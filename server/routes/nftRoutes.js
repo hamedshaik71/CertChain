@@ -57,6 +57,7 @@ router.post('/mint', authMiddleware, async (req, res) => {
 
 // ✅ ADD THIS: GET NFT BY TOKEN ID (for NFTViewer component)
 router.get('/:tokenId', async (req, res) => {
+    console.log("🎯 NFT API HIT:", req.params.tokenId);
     try {
         const { tokenId } = req.params;
         
