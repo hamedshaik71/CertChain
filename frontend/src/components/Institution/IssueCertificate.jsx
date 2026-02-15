@@ -25,14 +25,19 @@ const IssueCertificate = ({ user, token, onClose }) => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/institution/students', {
+      console.log("🔍 Fetching students...");
+      const response = await axios.get('https://certchain-api.onrender.com/api/institution/students', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log("✅ Students fetched:", response.data);
+      
       if (response.data.success) {
         setStudents(response.data.students || []);
       }
     } catch (err) {
       console.error('Error fetching students:', err);
+      // Don't block the UI, user can still type manually if fetch fails
     }
   };
 
@@ -52,21 +57,28 @@ const IssueCertificate = ({ user, token, onClose }) => {
     setIssuedCertificate(null);
 
     try {
-      console.log('📤 Submitting certificate data:', formData);
+      console.log('📤 Preparing submission...');
+
+      // 🚨 FIX: Use FormData because backend uses Multer
+      const submissionData = new FormData();
+      submissionData.append('studentCode', formData.studentCode);
+      submissionData.append('courseName', formData.courseName);
+      submissionData.append('grade', formData.grade);
+      submissionData.append('issueDate', formData.issueDate);
+      submissionData.append('category', formData.category);
+      
+      if (formData.expiryDate) {
+        submissionData.append('expiryDate', formData.expiryDate);
+      }
+
+      console.log('🚀 Sending FormData to server...');
 
       const response = await axios.post(
-        'http://localhost:5000/api/certificate/issue',
-        {
-          studentCode: formData.studentCode,
-          courseName: formData.courseName,
-          grade: formData.grade,
-          issueDate: formData.issueDate,
-          category: formData.category,
-          expiryDate: formData.expiryDate || null
-        },
+        'https://certchain-api.onrender.com/api/certificate/issue',
+        submissionData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            // Let Axios set the Content-Type to multipart/form-data automatically
             'Authorization': `Bearer ${token}`
           }
         }
@@ -129,13 +141,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
               📋 Certificate Details
             </h3>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Certificate ID</p>
-                <p className="font-semibold text-blue-600 text-sm break-all">
-                  {issuedCertificate.certificateHash?.substring(0, 20)}...
-                </p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Student Name</p>
                 <p className="font-semibold">{issuedCertificate.studentName}</p>
@@ -155,7 +161,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
               <div>
                 <p className="text-sm text-gray-500">Status</p>
                 <p className="font-semibold text-yellow-600">
-                  ⏳ {issuedCertificate.status?.replace(/_/g, ' ') || 'Pending Level 1'}
+                  ⏳ {issuedCertificate.status?.replace(/_/g, ' ') || 'Pending'}
                 </p>
               </div>
             </div>
@@ -163,7 +169,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
             {/* Hash Display */}
             <div className="mt-4 pt-4 border-t">
               <p className="text-sm text-gray-500 mb-1">Blockchain Hash</p>
-              <div className="bg-gray-100 p-2 rounded font-mono text-xs break-all">
+              <div className="bg-gray-100 p-2 rounded font-mono text-xs break-all text-gray-600">
                 {issuedCertificate.certificateHash}
               </div>
             </div>
@@ -178,18 +184,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
                 rel="noopener noreferrer"
                 className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-center font-medium shadow"
               >
-                📄 View Certificate PDF
-              </a>
-            )}
-            
-            {issuedCertificate.qrCodeURL && (
-              <a
-                href={issuedCertificate.qrCodeURL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center font-medium shadow"
-              >
-                🔗 View QR Code
+                📄 Download PDF
               </a>
             )}
             
@@ -216,7 +211,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
             <strong>❌ Error:</strong> {error}
           </div>
         )}
@@ -233,11 +228,11 @@ const IssueCertificate = ({ user, token, onClose }) => {
                 value={formData.studentCode}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               >
                 <option value="">-- Select Student --</option>
                 {students.map(student => (
-                  <option key={student.studentCode} value={student.studentCode}>
+                  <option key={student._id || student.studentCode} value={student.studentCode}>
                     {student.studentCode} - {student.fullName}
                   </option>
                 ))}
@@ -252,6 +247,11 @@ const IssueCertificate = ({ user, token, onClose }) => {
                 placeholder="Enter student code (e.g., STU-123456)"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+            )}
+            {students.length === 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                    No registered students found. You can enter the code manually.
+                </p>
             )}
           </div>
 
@@ -281,7 +281,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
               value={formData.grade}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="">-- Select Grade --</option>
               <option value="A+">A+ (Excellent)</option>
@@ -310,7 +310,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
               value={formData.category}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               <option value="COURSE">Course</option>
               <option value="DEGREE">Degree</option>
@@ -320,44 +320,45 @@ const IssueCertificate = ({ user, token, onClose }) => {
               <option value="CERTIFICATION">Certification</option>
               <option value="TRAINING">Training</option>
               <option value="ACHIEVEMENT">Achievement</option>
-              <option value="OTHER">Other</option>
             </select>
           </div>
 
-          {/* Issue Date */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Issue Date *
-            </label>
-            <input
-              type="date"
-              name="issueDate"
-              value={formData.issueDate}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Issue Date */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                Issue Date *
+                </label>
+                <input
+                type="date"
+                name="issueDate"
+                value={formData.issueDate}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+            </div>
 
-          {/* Expiry Date (Optional) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Expiry Date (Optional)
-            </label>
-            <input
-              type="date"
-              name="expiryDate"
-              value={formData.expiryDate}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            {/* Expiry Date (Optional) */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                Expiry Date
+                </label>
+                <input
+                type="date"
+                name="expiryDate"
+                value={formData.expiryDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+            </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all ${
+            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all mt-4 ${
               loading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl'
@@ -369,7 +370,7 @@ const IssueCertificate = ({ user, token, onClose }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Issuing Certificate...
+                Processing...
               </span>
             ) : (
               '🎓 Issue Certificate'
