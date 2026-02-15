@@ -1690,18 +1690,45 @@ app.get('/api/institution/dashboard',
 // 1️⃣3️⃣ GET INSTITUTION STUDENTS
 // ============================================================================
 
+// ============================================================================
+// 1️⃣3️⃣ GET INSTITUTION STUDENTS
+// ============================================================================
+
 app.get('/api/institution/students',
     authenticate,
     roleCheck(['institution']),
     async (req, res) => {
         try {
-            console.log('👨‍🎓 Fetching institution students');
+            console.log('👨‍🎓 Fetching institution students for:', req.user.email);
 
-            const studentQuery = req.user.walletAddress
-                ? { institutionAddress: req.user.walletAddress }
-                : { institutionAddress: req.user.email };
+            // 1. Gather all possible identifiers for this institution
+            const identifiers = [
+                req.user.email,             // Match by Email
+                req.user.institutionCode    // Match by Code (Most common)
+            ];
 
-            const students = await Student.find(studentQuery).sort({ createdAt: -1 });
+            // Match by Wallet (if it exists)
+            if (req.user.walletAddress) {
+                identifiers.push(req.user.walletAddress);
+            }
+            
+            // Match by ID string
+            if (req.user.institutionId) {
+                identifiers.push(req.user.institutionId.toString());
+            }
+
+            console.log('🔍 Searching students with identifiers:', identifiers);
+
+            // 2. Find students matching ANY of these identifiers
+            const students = await Student.find({
+                $or: [
+                    { institutionAddress: { $in: identifiers } }, // Checks if student linked via Addr/Email
+                    { institutionName: req.user.institutionCode }, // Checks if linked via Name/Code field
+                    { institutionCode: req.user.institutionCode }  // Specific check for code
+                ]
+            }).sort({ createdAt: -1 });
+
+            console.log(`✅ Found ${students.length} students`);
 
             res.json({
                 success: true,
@@ -1715,7 +1742,6 @@ app.get('/api/institution/students',
         }
     }
 );
-
 // ============================================================================
 // 1️⃣4️⃣ REVOKE CERTIFICATE
 // ============================================================================
